@@ -26,19 +26,20 @@ import com.example.android.marsrealestate.network.MarsProperty
 //import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import java.lang.System.getProperties
 
-// TODO (01) Create a MarsApiStatus enum with the LOADING, ERROR, and DONE states
+// DONE (01) Create a MarsApiStatus enum with the LOADING, ERROR, and DONE states
 /**
  * The [ViewModel] that is attached to the [OverviewFragment].
  */
+enum class MarsApiStatus { LOADING, ERROR, DONE }
+
 class OverviewViewModel : ViewModel() {
 
     // The internal MutableLiveData String that stores the most recent response status
-    // TODO (02) Change _status to type MarsApiStatus
-    private val _status = MutableLiveData<String>()
-
-    // The external immutable LiveData for the status String
-    val status: LiveData<String>
+    // DONE (02) Change _status to type MarsApiStatus
+    private val _status = MutableLiveData<MarsApiStatus>()
+    val status: LiveData<MarsApiStatus>
         get() = _status
 
     // Internally, we use a MutableLiveData, because we will be updating the List of MarsProperty
@@ -64,13 +65,16 @@ class OverviewViewModel : ViewModel() {
      * await to get the result of the transaction.
      */
     private fun getMarsRealEstateProperties() {
-        // TODO (03) Set the correct status for LOADING, ERROR, and DONE
+        // DONE (03) Set the correct status for LOADING, ERROR, and DONE
         viewModelScope.launch {
             try {
+                _status.value = MarsApiStatus.LOADING
+
                 _properties.value = MarsApi.retrofitService.getProperties()
-                _status.value = "Success: ${listResult.size}"
+                _status.value = MarsApiStatus.DONE
             } catch (e: Exception) {
-                _status.value = "Failure: ${e.message}"
+                _status.value = MarsApiStatus.ERROR
+                _properties.value = ArrayList()
             }
         }
     }
